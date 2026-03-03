@@ -344,7 +344,7 @@ ul { list-style: none; }
 }
 .hero-name-main {
   font-family: var(--font-display);
-  font-size: clamp(4rem,9vw,7rem);
+  font-size: clamp(3rem, 9vw, 7rem);
   font-weight: 800; line-height: .9;
   letter-spacing: -.05em;
   background: linear-gradient(135deg, #fff 0%, #b0c8ff 50%, var(--accent) 100%);
@@ -355,7 +355,7 @@ ul { list-style: none; }
   -webkit-background-clip: text; background-clip: text;
 }
 .hero-role {
-  font-family: var(--font-mono); font-size: clamp(.9rem,1.8vw,1.2rem);
+  font-family: var(--font-mono); font-size: clamp(.85rem,1.8vw,1.2rem);
   color: var(--text2); min-height: 2rem; margin-bottom: 1.5rem;
 }
 .typing-accent { color: var(--accent); }
@@ -803,36 +803,177 @@ ul { list-style: none; }
 @keyframes spin3d { from{transform:rotateY(0deg) rotateX(15deg)} to{transform:rotateY(360deg) rotateX(15deg)} }
 @keyframes fadeInUp { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
 
-/* ─── RESPONSIVE ─────────────────────────────────────────────────────────────── */
-@media(max-width:1024px) {
-  .hero-container { grid-template-columns: 1fr; text-align: center; }
+/* ═══════════════════════════════════════════════════════════════════════════════
+   RESPONSIVE — TABLET (max 1024px)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .hero-container { grid-template-columns: 1fr; text-align: center; gap: 2rem; }
   .hero-content { order: 2; }
   .hero-visual { order: 1; }
   .hero-badge, .hero-cta { justify-content: center; }
   .hero-stats { justify-content: center; }
   .hero-desc { margin-left: auto; margin-right: auto; }
-  .about-grid { grid-template-columns: 1fr; }
+  .about-grid { grid-template-columns: 1fr; gap: 3rem; }
   .about-visual { margin: 0 auto; }
   .contact-grid { grid-template-columns: 1fr; gap: 3rem; }
 }
-@media(max-width:768px) {
-  .section { padding: 5rem 0; }
-  .container { padding: 0 1.25rem; }
-  .nav-links, .hire-btn { display: none; }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   RESPONSIVE — MOBILE (max 768px)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Global */
+  html, body { overflow-x: hidden; }
+  .section { padding: 4rem 0; }
+  .container { padding: 0 1.1rem; }
+
+  /* Hide cursor on touch devices */
+  .cursor-dot, .cursor-ring { display: none; }
+  body { cursor: auto; }
+  button { cursor: pointer; }
+
+  /* Navbar */
+  .nav-links { display: none; }
   .nav-links.open {
-    display: flex; flex-direction: column;
-    position: fixed; inset: 0; top: 60px;
-    background: var(--bg); z-index: 499;
-    align-items: center; justify-content: center; gap: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 58px; left: 0; right: 0;
+    background: rgba(5,5,8,.97);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 1rem;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 498;
   }
-  .nav-link { font-size: 1.2rem; }
+  .nav-links.open .nav-link { font-size: 1rem; padding: .65rem 2rem; }
+  .hire-btn { display: none; }
   .menu-btn { display: flex; }
-  .proj-grid { grid-template-columns: 1fr; }
-  .proj-card.featured { grid-column: auto; display: flex; flex-direction: column; }
-  .proj-card.featured .proj-visual { border-right: none; border-bottom: 1px solid var(--border); }
-  .blog-grid { grid-template-columns: 1fr; }
-  .testi-grid { grid-template-columns: 1fr; }
-  .form-row { grid-template-columns: 1fr; }
-  .hero-card-3d { width: 260px; }
+
+  /* Hero */
+  .hero-section { min-height: 100svh; padding-top: 4rem; }
+  .hero-container {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding: 1rem 0 3rem;
+    gap: 1.5rem;
+  }
+  .hero-content { order: 2; }
+  .hero-visual {
+    order: 1;
+    width: 100%;
+    max-width: 260px;
+    margin: 0 auto;
+  }
+  .hero-badge { justify-content: center; font-size: .62rem; padding: .35rem .85rem; }
+  .hero-name-main { font-size: clamp(2.8rem, 13vw, 4.5rem); }
+  .hero-role { font-size: .82rem; }
+  .hero-desc { font-size: .9rem; max-width: 100%; }
+  .hero-cta { justify-content: center; gap: .6rem; }
+  .hero-cta .btn { padding: .7rem 1.3rem; font-size: .72rem; }
+  .hero-stats { justify-content: center; gap: 1rem; flex-wrap: wrap; }
+  .stat-val { font-size: 1.6rem; }
+  .stat-sep { display: none; }
+
+  /* Hero card */
+  .hero-card-3d {
+    width: 210px;
+    padding: 1.75rem 1.25rem;
+    transform: none !important;
+  }
+  .hero-card-3d:hover { transform: none !important; }
+  .hero-avatar { width: 60px; height: 60px; margin-bottom: 1rem; }
+
+  /* Float badges — scale down & reposition to stay inside card */
+  .float-badge {
+    font-size: .58rem !important;
+    padding: 3px 7px !important;
+    white-space: nowrap;
+  }
+  /* Hero badges — keep within visual wrapper */
+  .hero-visual > .float-badge:nth-child(2) { top: -0.3rem !important; left: -0.3rem !important; right: auto !important; }
+  .hero-visual > .float-badge:nth-child(3) { top: 28% !important; right: -0.3rem !important; left: auto !important; }
+  .hero-visual > .float-badge:nth-child(4) { bottom: 22% !important; left: -0.3rem !important; right: auto !important; }
+  .hero-visual > .float-badge:nth-child(5) { bottom: -0.3rem !important; right: 0.4rem !important; left: auto !important; }
+
+  /* About section float badges */
+  .about-visual { overflow: visible; padding: 1rem; }
+  .about-visual > .float-badge:nth-child(2) { top: -0.2rem !important; right: 0 !important; left: auto !important; }
+  .about-visual > .float-badge:nth-child(3) { bottom: 2rem !important; left: 0 !important; right: auto !important; }
+  .about-visual > .float-badge:nth-child(4) { bottom: -0.2rem !important; right: 1rem !important; left: auto !important; }
+
+  /* Avatar rings hidden on mobile (overflow issue) */
   .avatar-ring { display: none; }
+
+  /* About */
+  .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .about-visual { justify-content: center; }
+  .about-avatar { width: 180px; height: 180px; }
+  .trait-grid { grid-template-columns: 1fr 1fr; gap: .5rem; }
+  .trait { font-size: .78rem; padding: .55rem .75rem; }
+  .about-cta { flex-wrap: wrap; }
+
+  /* Skills */
+  .skills-tabs { gap: .4rem; }
+  .skill-tab { font-size: .65rem; padding: .45rem 1rem; }
+
+  /* Projects */
+  .proj-grid { grid-template-columns: 1fr; }
+  .proj-card.featured {
+    grid-column: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .proj-card.featured .proj-visual {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Blog */
+  .blog-grid { grid-template-columns: 1fr; }
+
+  /* Testimonials */
+  .testi-grid { grid-template-columns: 1fr; }
+
+  /* Contact */
+  .contact-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+  .form-row { grid-template-columns: 1fr; }
+  .social-row { justify-content: center; }
+
+  /* Section header */
+  .section-title { font-size: clamp(1.7rem, 7vw, 2.5rem); }
+  .section-header { margin-bottom: 2.5rem; }
+
+  /* Footer */
+  .footer-inner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: .5rem;
+  }
+
+  /* Back top */
+  .back-top { bottom: 1.2rem; right: 1rem; width: 40px; height: 40px; font-size: .9rem; }
+
+  /* Canvas opacity on mobile */
+  .canvas3d { opacity: 0.25; }
+
+  /* Scroll hint — hide on short screens */
+  .scroll-hint { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   RESPONSIVE — SMALL MOBILE (max 420px)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 420px) {
+  .hero-name-main { font-size: clamp(2.4rem, 12vw, 3.2rem); }
+  .hero-card-3d { width: 180px; padding: 1.4rem 1rem; }
+  .hero-cta .btn { padding: .6rem 1rem; font-size: .68rem; }
+  .stat-val { font-size: 1.4rem; }
+  .about-avatar { width: 150px; height: 150px; border-radius: 22px; }
+  .float-badge { font-size: .52rem !important; padding: 2px 6px !important; }
+  .trait-grid { grid-template-columns: 1fr; }
+  .container { padding: 0 0.9rem; }
+  .section-title { font-size: clamp(1.5rem, 8vw, 2rem); }
 }
