@@ -590,7 +590,7 @@ function About() {
               </div>
 
               <div className="about-cta">
-                <a href="https://drive.google.com/file/d/1lfZfLKO3xocYc4z8s8sibSAyxhAqrnN5/view?usp=drive_link" className="btn btn-primary hoverable">⬇ Download CV</a>
+                <a href="https://drive.google.com/file/d/1lfZfLKO3xocYc4z8s8sibSAyxhAqrnN5/view?usp=drive_link" className="btn btn-primary hoverable">⬇ Download Resume</a>
                 <a href="#contact" className="btn btn-outline hoverable">Let's Talk</a>
               </div>
             </div>
