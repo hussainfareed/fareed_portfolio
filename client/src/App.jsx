@@ -925,7 +925,7 @@ export default function App() {
         <div className="container">
           <div className="footer-inner">
             <div className="footer-logo"><FLogo size={28}/><span><span className="accent">&lt;</span>Fareed<span className="accent">/&gt;</span></span></div>
-            <span className="footer-copy">© 2025 Fareed Hussain. All rights reserved.</span>
+            <span className="footer-copy">© Fareed Hussain. All rights reserved.</span>
             <span className="footer-copy">Built with ❤️ using MERN Stack 🚀</span>
           </div>
         </div>
