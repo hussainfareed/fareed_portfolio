@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
 import { useInView } from 'react-intersection-observer';
+import profileImg from './profile.jpg';
 import './styles/global.css';
 
 // ─── GITHUB CONFIG ───────────────────────────────────────────────────────────────
@@ -257,19 +258,27 @@ function Loader({ onDone }) {
   );
 }
 
-// ─── FLOGO ─────────────────────────────────────────────────────────────────────
+// ─── FLOGO (now shows profile photo instead of the "F" mark) ──────────────────
 function FLogo({ size = 44, animated = false }) {
   return (
-    <div className={`f-logo ${animated ? 'f-logo-animated' : ''}`} style={{ width: size, height: size }}>
-      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" width={size} height={size}>
-        <defs>
-          <linearGradient id="fgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#4DFFB4" /><stop offset="100%" stopColor="#6366f1" /></linearGradient>
-          <filter id="glow"><feGaussianBlur stdDeviation="2" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
-        </defs>
-        <rect width="60" height="60" rx="14" fill="url(#fgrad)" opacity="0.15" />
-        <rect width="60" height="60" rx="14" fill="none" stroke="url(#fgrad)" strokeWidth="1.5" />
-        <path d="M17 14h26M17 14v32M17 31h18" stroke="url(#fgrad)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" filter="url(#glow)" />
-      </svg>
+    <div
+      className={`f-logo ${animated ? 'f-logo-animated' : ''}`}
+      style={{
+        width: size,
+        height: size,
+        borderRadius: '50%',
+        padding: 2,
+        background: 'linear-gradient(135deg,#4DFFB4,#6366f1)',
+        boxShadow: '0 0 18px rgba(77,255,180,.35)',
+      }}
+    >
+      <div style={{ width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', background: 'var(--bg,#0a0a12)' }}>
+        <img
+          src={profileImg}
+          alt="Fareed Hussain"
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+        />
+      </div>
     </div>
   );
 }
@@ -916,7 +925,7 @@ export default function App() {
         <div className="container">
           <div className="footer-inner">
             <div className="footer-logo"><FLogo size={28}/><span><span className="accent">&lt;</span>Fareed<span className="accent">/&gt;</span></span></div>
-            <span className="footer-copy">© Fareed Hussain. All rights reserved.</span>
+            <span className="footer-copy">© 2025 Fareed Hussain. All rights reserved.</span>
             <span className="footer-copy">Built with ❤️ using MERN Stack 🚀</span>
           </div>
         </div>
