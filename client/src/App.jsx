@@ -276,7 +276,7 @@ function FLogo({ size = 44, animated = false }) {
         <img
           src={profileImg}
           alt="Fareed Hussain"
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%', display: 'block' }}
         />
       </div>
     </div>
