@@ -1,7 +1,21 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
 import { useInView } from 'react-intersection-observer';
+import emailjs from '@emailjs/browser';
 import './styles/global.css';
+
+// ─── EMAILJS CONFIG ─────────────────────────────────────────────────────────────
+// 1. Create a free account at https://www.emailjs.com
+// 2. Add an Email Service (e.g. Gmail) -> copy the Service ID
+// 3. Create an Email Template with {{name}}, {{email}}, {{subject}}, {{message}} -> copy Template ID
+// 4. Copy your Public Key from Account > API Keys
+// 5. Run: npm install @emailjs/browser
+const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID';
+const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
+const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY';
+
+// ─── GITHUB CONFIG ───────────────────────────────────────────────────────────────
+const GITHUB_USERNAME = 'hussainfareed';
 
 // ─── PROJECTS DATA ─────────────────────────────────────────────────────────────
 const PROJECTS = [
@@ -324,8 +338,8 @@ function FloatBadge({ children, style, color, delay = 0 }) {
 // ─── NAVBAR ────────────────────────────────────────────────────────────────────
 function Navbar({ theme, toggleTheme }) {
   const [scrolled,setScrolled]=useState(false);const [active,setActive]=useState('home');const [menuOpen,setMenuOpen]=useState(false);
-  useEffect(()=>{const h=()=>{setScrolled(window.scrollY>60);const ids=['contact','blog','projects','skills','about','home'];for(const id of ids){const el=document.getElementById(id);if(el&&window.scrollY>=el.offsetTop-200){setActive(id);break;}}};window.addEventListener('scroll',h);return()=>window.removeEventListener('scroll',h);},[]);
-  const links=[['home','Home'],['about','About'],['skills','Skills'],['projects','Projects'],['blog','Blog'],['contact','Contact']];
+  useEffect(()=>{const h=()=>{setScrolled(window.scrollY>60);const ids=['contact','blog','projects','github','skills','about','home'];for(const id of ids){const el=document.getElementById(id);if(el&&window.scrollY>=el.offsetTop-200){setActive(id);break;}}};window.addEventListener('scroll',h);return()=>window.removeEventListener('scroll',h);},[]);
+  const links=[['home','Home'],['about','About'],['skills','Skills'],['projects','Projects'],['github','GitHub'],['blog','Blog'],['contact','Contact']];
   return (
     <nav className={`navbar ${scrolled?'scrolled':''}`}>
       <div className="container">
@@ -441,6 +455,107 @@ function Skills() {
           ))}
         </div>
         <Reveal delay={0.2}><div className="tech-cloud">{techCloud.map(t=><span key={t} className="tech-tag hoverable">{t}</span>)}</div></Reveal>
+      </div>
+    </section>
+  );
+}
+
+// ─── GITHUB STATS ──────────────────────────────────────────────────────────────
+function GithubStats({ username = GITHUB_USERNAME }) {
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true });
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchStats = async () => {
+      try {
+        const res = await fetch(`https://api.github.com/users/${username}`);
+        if (!res.ok) throw new Error('user fetch failed');
+        const data = await res.json();
+        const reposRes = await fetch(`https://api.github.com/users/${username}/repos?per_page=100`);
+        const repos = reposRes.ok ? await reposRes.json() : [];
+        const totalStars = Array.isArray(repos) ? repos.reduce((s, r) => s + (r.stargazers_count || 0), 0) : 0;
+        if (!cancelled) {
+          setStats({
+            repos: data.public_repos || 0,
+            followers: data.followers || 0,
+            following: data.following || 0,
+            stars: totalStars,
+          });
+        }
+      } catch (e) {
+        if (!cancelled) setError(true);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    fetchStats();
+    return () => { cancelled = true; };
+  }, [username]);
+
+  return (
+    <section className="section" id="github" ref={ref} style={{ background: 'var(--bg2)' }}>
+      <div className="container">
+        <Reveal>
+          <div className="section-header">
+            <span className="section-tag">Open Source</span>
+            <h2 className="section-title">GitHub <em>Activity</em></h2>
+            <p>Live stats pulled directly from my GitHub profile</p>
+          </div>
+        </Reveal>
+
+        {loading && <p style={{ textAlign: 'center', opacity: 0.6 }}>Loading stats…</p>}
+        {!loading && error && (
+          <p style={{ textAlign: 'center', opacity: 0.6 }}>
+            Couldn't load live stats right now — visit my{' '}
+            <a href={`https://github.com/${username}`} target="_blank" rel="noreferrer" className="hoverable" style={{ color: 'var(--accent,#4DFFB4)' }}>
+              GitHub profile
+            </a>{' '}
+            directly.
+          </p>
+        )}
+        {!loading && !error && stats && (
+          <div className="github-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: '1rem', maxWidth: '700px', margin: '0 auto' }}>
+            {[
+              ['📦', stats.repos, 'Repositories'],
+              ['⭐', stats.stars, 'Total Stars'],
+              ['👥', stats.followers, 'Followers'],
+              ['🔗', stats.following, 'Following'],
+            ].map(([icon, val, label], i) => (
+              <div
+                key={label}
+                className="hoverable"
+                style={{
+                  opacity: inView ? 1 : 0,
+                  transform: inView ? 'none' : 'translateY(20px)',
+                  transition: `all .6s ease ${i * 0.1}s`,
+                  background: 'var(--surface,#1a1a2e)',
+                  border: '1px solid var(--border,rgba(255,255,255,.08))',
+                  borderRadius: '16px',
+                  padding: '1.5rem',
+                  textAlign: 'center',
+                }}
+              >
+                <div style={{ fontSize: '1.8rem' }}>{icon}</div>
+                <div style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--accent,#4DFFB4)' }}>{val}</div>
+                <div style={{ fontSize: '0.8rem', opacity: 0.7 }}>{label}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <Reveal delay={0.2}>
+          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+            <img
+              src={`https://github-readme-streak-stats.herokuapp.com/?user=${username}&theme=radical&hide_border=true`}
+              alt="GitHub streak stats"
+              style={{ maxWidth: '100%', borderRadius: '12px' }}
+              onError={(e) => { e.target.style.display = 'none'; }}
+            />
+          </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -586,7 +701,38 @@ function Contact() {
   const [form,setForm]=useState({name:'',email:'',subject:'',message:''});
   const [sending,setSending]=useState(false);const [sent,setSent]=useState(false);
   const update=k=>e=>setForm(f=>({...f,[k]:e.target.value}));
-  const submit=e=>{e.preventDefault();setSending(true);setTimeout(()=>{setSent(true);setForm({name:'',email:'',subject:'',message:''});toast.success("Message sent! I'll reply within 24hrs. 🚀");setTimeout(()=>setSent(false),5000);setSending(false);},1000);};
+
+  const submit=e=>{
+    e.preventDefault();
+    if(!form.name || !form.email || !form.message){
+      toast.error('Please fill in name, email and message.');
+      return;
+    }
+    setSending(true);
+    emailjs.send(
+      EMAILJS_SERVICE_ID,
+      EMAILJS_TEMPLATE_ID,
+      {
+        name: form.name,
+        email: form.email,
+        subject: form.subject || 'New message from portfolio',
+        message: form.message,
+      },
+      EMAILJS_PUBLIC_KEY
+    )
+      .then(() => {
+        setSent(true);
+        setForm({name:'',email:'',subject:'',message:''});
+        toast.success("Message sent! I'll reply within 24hrs. 🚀");
+        setTimeout(()=>setSent(false),5000);
+      })
+      .catch((err) => {
+        console.error('EmailJS error:', err);
+        toast.error("Couldn't send message. Please email me directly.");
+      })
+      .finally(() => setSending(false));
+  };
+
   return (
     <section className="section" id="contact" style={{background:'var(--bg2)'}}>
       <div className="container">
@@ -677,6 +823,7 @@ export default function App() {
         <About/>
         <Skills/>
         <Projects/>
+        <GithubStats username={GITHUB_USERNAME}/>
         <Blog/>
         <Contact/>
       </main>
@@ -684,7 +831,7 @@ export default function App() {
         <div className="container">
           <div className="footer-inner">
             <div className="footer-logo"><FLogo size={28}/><span><span className="accent">&lt;</span>Fareed<span className="accent">/&gt;</span></span></div>
-            <span className="footer-copy">© Fareed Hussain. All rights reserved.</span>
+            <span className="footer-copy">© 2025 Fareed Hussain. All rights reserved.</span>
             <span className="footer-copy">Built with ❤️ using MERN Stack 🚀</span>
           </div>
         </div>
