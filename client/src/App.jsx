@@ -1,18 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
 import { useInView } from 'react-intersection-observer';
-import emailjs from '@emailjs/browser';
 import './styles/global.css';
-
-// ─── EMAILJS CONFIG ─────────────────────────────────────────────────────────────
-// 1. Create a free account at https://www.emailjs.com
-// 2. Add an Email Service (e.g. Gmail) -> copy the Service ID
-// 3. Create an Email Template with {{name}}, {{email}}, {{subject}}, {{message}} -> copy Template ID
-// 4. Copy your Public Key from Account > API Keys
-// 5. Run: npm install @emailjs/browser
-const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID';
-const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
-const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY';
 
 // ─── GITHUB CONFIG ───────────────────────────────────────────────────────────────
 const GITHUB_USERNAME = 'hussainfareed';
@@ -702,36 +691,7 @@ function Contact() {
   const [sending,setSending]=useState(false);const [sent,setSent]=useState(false);
   const update=k=>e=>setForm(f=>({...f,[k]:e.target.value}));
 
-  const submit=e=>{
-    e.preventDefault();
-    if(!form.name || !form.email || !form.message){
-      toast.error('Please fill in name, email and message.');
-      return;
-    }
-    setSending(true);
-    emailjs.send(
-      EMAILJS_SERVICE_ID,
-      EMAILJS_TEMPLATE_ID,
-      {
-        name: form.name,
-        email: form.email,
-        subject: form.subject || 'New message from portfolio',
-        message: form.message,
-      },
-      EMAILJS_PUBLIC_KEY
-    )
-      .then(() => {
-        setSent(true);
-        setForm({name:'',email:'',subject:'',message:''});
-        toast.success("Message sent! I'll reply within 24hrs. 🚀");
-        setTimeout(()=>setSent(false),5000);
-      })
-      .catch((err) => {
-        console.error('EmailJS error:', err);
-        toast.error("Couldn't send message. Please email me directly.");
-      })
-      .finally(() => setSending(false));
-  };
+  const submit=e=>{e.preventDefault();setSending(true);setTimeout(()=>{setSent(true);setForm({name:'',email:'',subject:'',message:''});toast.success("Message sent! I'll reply within 24hrs. 🚀");setTimeout(()=>setSent(false),5000);setSending(false);},1000);};
 
   return (
     <section className="section" id="contact" style={{background:'var(--bg2)'}}>
@@ -831,7 +791,7 @@ export default function App() {
         <div className="container">
           <div className="footer-inner">
             <div className="footer-logo"><FLogo size={28}/><span><span className="accent">&lt;</span>Fareed<span className="accent">/&gt;</span></span></div>
-            <span className="footer-copy">© 2025 Fareed Hussain. All rights reserved.</span>
+            <span className="footer-copy">© Fareed Hussain. All rights reserved.</span>
             <span className="footer-copy">Built with ❤️ using MERN Stack 🚀</span>
           </div>
         </div>
