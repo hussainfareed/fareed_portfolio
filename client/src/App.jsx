@@ -327,7 +327,7 @@ function FloatBadge({ children, style, color, delay = 0 }) {
 // ─── NAVBAR ────────────────────────────────────────────────────────────────────
 function Navbar({ theme, toggleTheme }) {
   const [scrolled,setScrolled]=useState(false);const [active,setActive]=useState('home');const [menuOpen,setMenuOpen]=useState(false);
-  useEffect(()=>{const h=()=>{setScrolled(window.scrollY>60);const ids=['contact','blog','projects','github','skills','about','home'];for(const id of ids){const el=document.getElementById(id);if(el&&window.scrollY>=el.offsetTop-200){setActive(id);break;}}};window.addEventListener('scroll',h);return()=>window.removeEventListener('scroll',h);},[]);
+  useEffect(()=>{const h=()=>{setScrolled(window.scrollY>60);const ids=['contact','snapshot','blog','github','projects','skills','about','home'];for(const id of ids){const el=document.getElementById(id);if(el&&window.scrollY>=el.offsetTop-200){setActive(id);break;}}};window.addEventListener('scroll',h);return()=>window.removeEventListener('scroll',h);},[]);
   const links=[['home','Home'],['about','About'],['skills','Skills'],['projects','Projects'],['github','GitHub'],['blog','Blog'],['contact','Contact']];
   return (
     <nav className={`navbar ${scrolled?'scrolled':''}`}>
@@ -685,6 +685,130 @@ function Blog() {
   );
 }
 
+// ─── 3D TILT INFO CARD ─────────────────────────────────────────────────────────
+function TiltInfoCard() {
+  const cardRef = useRef(null);
+  const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
+  const [glare, setGlare] = useState({ x: 50, y: 50, o: 0 });
+  const { ref, inView } = useInView({ threshold: 0.2, triggerOnce: true });
+
+  const onMove = (e) => {
+    const card = cardRef.current;
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width;
+    const py = (e.clientY - rect.top) / rect.height;
+    const ry = (px - 0.5) * 22;
+    const rx = (0.5 - py) * 22;
+    setTilt({ rx, ry });
+    setGlare({ x: px * 100, y: py * 100, o: 0.25 });
+  };
+  const onLeave = () => {
+    setTilt({ rx: 0, ry: 0 });
+    setGlare((g) => ({ ...g, o: 0 }));
+  };
+
+  const stats = [
+    ['4+', 'Projects Shipped'],
+    ['90%+', 'Avg. Skill Proficiency'],
+    ['12+', 'Core Technologies'],
+    ['24hr', 'Reply Time'],
+  ];
+
+  return (
+    <section className="section" id="snapshot" ref={ref} style={{ background: 'var(--bg)', perspective: '1200px' }}>
+      <div className="container">
+        <Reveal>
+          <div className="section-header">
+            <span className="section-tag">At a Glance</span>
+            <h2 className="section-title">My <em>Snapshot</em></h2>
+            <p>Move your mouse over the card 👇</p>
+          </div>
+        </Reveal>
+
+        <div
+          style={{
+            opacity: inView ? 1 : 0,
+            transform: inView ? 'none' : 'translateY(40px) scale(.95)',
+            transition: 'opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1)',
+            maxWidth: '620px',
+            margin: '0 auto',
+          }}
+        >
+          <div
+            ref={cardRef}
+            onMouseMove={onMove}
+            onMouseLeave={onLeave}
+            className="hoverable"
+            style={{
+              position: 'relative',
+              borderRadius: '24px',
+              padding: '2.5rem 2rem',
+              background: 'linear-gradient(135deg, rgba(77,255,180,.08), rgba(99,102,241,.08))',
+              border: '1px solid var(--border, rgba(255,255,255,.1))',
+              backdropFilter: 'blur(10px)',
+              transformStyle: 'preserve-3d',
+              transform: `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`,
+              transition: 'transform .15s ease-out',
+              overflow: 'hidden',
+              cursor: 'pointer',
+            }}
+          >
+            {/* glare overlay */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                pointerEvents: 'none',
+                background: `radial-gradient(circle at ${glare.x}% ${glare.y}%, rgba(255,255,255,${glare.o}), transparent 55%)`,
+                transition: 'opacity .2s ease',
+              }}
+            />
+
+            <div style={{ transform: 'translateZ(40px)', textAlign: 'center' }}>
+              <div style={{ display: 'inline-block', marginBottom: '1rem' }}>
+                <FLogo size={72} />
+              </div>
+              <h3 style={{ fontSize: '1.6rem', fontWeight: 800, margin: 0 }}>Fareed Hussain</h3>
+              <p style={{ opacity: 0.75, margin: '0.35rem 0 1.5rem', fontSize: '0.95rem' }}>
+                Computer Engineer & MERN Stack Developer · Pakistan 🇵🇰
+              </p>
+
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit,minmax(120px,1fr))',
+                  gap: '1rem',
+                  transform: 'translateZ(20px)',
+                }}
+              >
+                {stats.map(([val, label]) => (
+                  <div
+                    key={label}
+                    style={{
+                      background: 'rgba(255,255,255,.04)',
+                      border: '1px solid var(--border, rgba(255,255,255,.08))',
+                      borderRadius: '14px',
+                      padding: '1rem 0.75rem',
+                    }}
+                  >
+                    <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--accent,#4DFFB4)' }}>{val}</div>
+                    <div style={{ fontSize: '0.72rem', opacity: 0.7, marginTop: '0.25rem' }}>{label}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ marginTop: '1.75rem', transform: 'translateZ(30px)' }}>
+                <a href="#contact" className="btn btn-primary hoverable">Let's Work Together →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── CONTACT ───────────────────────────────────────────────────────────────────
 function Contact() {
   const [form,setForm]=useState({name:'',email:'',subject:'',message:''});
@@ -785,6 +909,7 @@ export default function App() {
         <Projects/>
         <GithubStats username={GITHUB_USERNAME}/>
         <Blog/>
+        <TiltInfoCard/>
         <Contact/>
       </main>
       <footer className="footer">
