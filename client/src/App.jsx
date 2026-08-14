@@ -616,54 +616,151 @@ function ProjectModal({ project, onClose }) {
 
 // ─── PROJECT MOCKUP (generated UI, acts as a live "screen recording" preview) ──
 function ProjectMockup({ kind, c1, c2 }) {
-  const rows = Array.from({ length: 6 });
+  const Star = ({ x, y, fill }) => (
+    <path transform={`translate(${x} ${y}) scale(0.55)`} d="M8 0l2.35 4.76 5.25.76-3.8 3.7.9 5.24L8 11.9l-4.7 2.56.9-5.24-3.8-3.7 5.25-.76z" fill={fill} />
+  );
+
   return (
     <svg className="proj-mockup-svg" viewBox="0 0 400 1000" preserveAspectRatio="xMidYMin slice" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id={`bg-${kind}`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor={c1} stopOpacity="0.18" />
-          <stop offset="100%" stopColor={c2} stopOpacity="0.10" />
+          <stop offset="0%" stopColor={c1} stopOpacity="0.16" />
+          <stop offset="100%" stopColor={c2} stopOpacity="0.08" />
+        </linearGradient>
+        <linearGradient id={`photo-${kind}`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor={c1} stopOpacity="0.55" />
+          <stop offset="100%" stopColor={c2} stopOpacity="0.45" />
         </linearGradient>
       </defs>
       <rect width="400" height="1000" fill={`url(#bg-${kind})`} />
 
-      {kind === 'listing' && rows.map((_, i) => (
-        <g key={i} transform={`translate(24 ${40 + i * 150})`}>
-          <rect width="352" height="120" rx="14" fill="#ffffff" opacity="0.06" />
-          <rect width="130" height="120" rx="14" fill={c1} opacity="0.35" />
-          <rect x="150" y="16" width="180" height="14" rx="4" fill="#ffffff" opacity="0.5" />
-          <rect x="150" y="42" width="130" height="10" rx="4" fill="#ffffff" opacity="0.3" />
-          <rect x="150" y="66" width="90" height="10" rx="4" fill="#ffffff" opacity="0.25" />
-          <rect x="150" y="92" width="60" height="18" rx="9" fill={c2} opacity="0.55" />
-        </g>
-      ))}
+      {/* shared top app bar */}
+      <g transform="translate(0 44)">
+        <rect width="400" height="52" fill="#ffffff" opacity="0.04" />
+        <circle cx="28" cy="26" r="9" fill={c1} opacity="0.8" />
+        <rect x="44" y="20" width="60" height="12" rx="3" fill="#ffffff" opacity="0.4" />
+        <rect x="240" y="16" width="120" height="20" rx="10" fill="#ffffff" opacity="0.06" />
+        <circle cx="360" cy="26" r="12" fill={c2} opacity="0.35" />
+      </g>
 
-      {kind === 'chat' && rows.map((_, i) => (
-        <g key={i} transform={`translate(0 ${40 + i * 150})`}>
-          <rect x={i % 2 === 0 ? 24 : 130} width="246" height="80" rx="16" fill={i % 2 === 0 ? '#ffffff' : c1} opacity={i % 2 === 0 ? 0.07 : 0.4} />
-          <rect x={(i % 2 === 0 ? 24 : 130) + 18} y="16" width="180" height="10" rx="4" fill="#ffffff" opacity="0.45" />
-          <rect x={(i % 2 === 0 ? 24 : 130) + 18} y="36" width="140" height="10" rx="4" fill="#ffffff" opacity="0.3" />
-          <rect x={(i % 2 === 0 ? 24 : 130) + 18} y="56" width="100" height="10" rx="4" fill="#ffffff" opacity="0.25" />
-        </g>
-      ))}
+      {/* ── StayHub: property listing feed ───────────────────────────────── */}
+      {kind === 'listing' && (
+        <>
+          <g transform="translate(24 116)">
+            <rect width="352" height="30" rx="15" fill="#ffffff" opacity="0.07" />
+            <rect x="14" y="10" width="140" height="10" rx="4" fill="#ffffff" opacity="0.3" />
+            <circle cx="330" cy="15" r="9" fill={c2} opacity="0.6" />
+          </g>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <g key={i} transform={`translate(24 ${166 + i * 156})`}>
+              <rect width="352" height="136" rx="16" fill="#ffffff" opacity="0.05" />
+              <rect width="140" height="136" rx="16" fill={`url(#photo-${kind})`} />
+              <path d={`M20 100 L55 60 L80 82 L110 40 L140 100 Z`} fill="#ffffff" opacity="0.18" />
+              <circle cx="35" cy="35" r="10" fill="#ffffff" opacity="0.35" />
+              <rect x="10" y="10" width="46" height="16" rx="8" fill="#00000055" />
+              <Star x={16} y={14} fill="#ffd54f" />
+              <rect x="30" y="17" width="18" height="8" rx="2" fill="#ffffff" opacity="0.7" />
+              <rect x="158" y="14" width="170" height="14" rx="4" fill="#ffffff" opacity="0.55" />
+              <rect x="158" y="38" width="130" height="10" rx="4" fill="#ffffff" opacity="0.3" />
+              <Star x={158} y={62} fill={c2} /><Star x={172} y={62} fill={c2} /><Star x={186} y={62} fill={c2} /><Star x={200} y={62} fill={c2} /><Star x={214} y={62} fill="#ffffff33" />
+              <rect x="158" y="80" width="90" height="8" rx="4" fill="#ffffff" opacity="0.22" />
+              <rect x="158" y="104" width="70" height="22" rx="11" fill={c2} opacity="0.7" />
+              <rect x="170" y="111" width="46" height="8" rx="4" fill="#0a0a12" opacity="0.7" />
+            </g>
+          ))}
+        </>
+      )}
 
-      {kind === 'code' && rows.map((_, i) => (
-        <g key={i} transform={`translate(24 ${40 + i * 60})`}>
-          <rect width={14} height="14" rx="3" fill={i % 3 === 0 ? c2 : '#ffffff'} opacity={i % 3 === 0 ? 0.7 : 0.15} />
-          <rect x="26" width={90 + (i * 37) % 200} height="14" rx="4" fill={i % 4 === 0 ? c1 : '#ffffff'} opacity={i % 4 === 0 ? 0.5 : 0.28} />
-        </g>
-      ))}
+      {/* ── Gen AI: interview report / chat feed ─────────────────────────── */}
+      {kind === 'chat' && (
+        <>
+          <g transform="translate(24 120)">
+            <rect width="352" height="86" rx="18" fill={`url(#photo-${kind})`} opacity="0.3" />
+            <rect x="20" y="18" width="150" height="12" rx="4" fill="#ffffff" opacity="0.55" />
+            <rect x="20" y="40" width="200" height="9" rx="4" fill="#ffffff" opacity="0.3" />
+            {[0, 1, 2, 3].map((b) => (
+              <rect key={b} x={20 + b * 60} y="60" width="46" height="14" rx="7" fill={c2} opacity={0.25 + b * 0.15} />
+            ))}
+          </g>
+          {Array.from({ length: 5 }).map((_, i) => {
+            const mine = i % 2 === 1;
+            return (
+              <g key={i} transform={`translate(0 ${224 + i * 118})`}>
+                {!mine && <circle cx="38" cy="26" r="16" fill={c1} opacity="0.5" />}
+                <rect x={mine ? 108 : 62} width="264" height="88" rx="18" fill={mine ? c1 : '#ffffff'} opacity={mine ? 0.32 : 0.06} />
+                <rect x={(mine ? 108 : 62) + 18} y="16" width="200" height="10" rx="4" fill="#ffffff" opacity="0.45" />
+                <rect x={(mine ? 108 : 62) + 18} y="36" width="160" height="9" rx="4" fill="#ffffff" opacity="0.28" />
+                <rect x={(mine ? 108 : 62) + 18} y="55" width={mine ? 100 : 130} height="9" rx="4" fill="#ffffff" opacity="0.22" />
+                {mine && <circle cx="378" cy="26" r="16" fill={c2} opacity="0.55" />}
+              </g>
+            );
+          })}
+        </>
+      )}
 
-      {kind === 'booking' && rows.map((_, i) => (
-        <g key={i} transform={`translate(24 ${40 + i * 150})`}>
-          <rect width="352" height="120" rx="16" fill="#ffffff" opacity="0.06" />
-          <circle cx="60" cy="60" r="30" fill={c1} opacity="0.4" />
-          <rect x="108" y="30" width="160" height="12" rx="4" fill="#ffffff" opacity="0.5" />
-          <rect x="108" y="52" width="110" height="10" rx="4" fill="#ffffff" opacity="0.28" />
-          <rect x="108" y="74" width="80" height="18" rx="9" fill={c2} opacity="0.5" />
-          <rect x="290" y="45" width="42" height="30" rx="8" fill={c2} opacity="0.35" />
-        </g>
-      ))}
+      {/* ── AI Code Review: editor with syntax highlight + inline warning ─── */}
+      {kind === 'code' && (
+        <>
+          <g transform="translate(24 120)">
+            <rect width="352" height="24" rx="6" fill="#ffffff" opacity="0.05" />
+            {['App.js', 'utils.js', 'api.js'].map((f, i) => (
+              <rect key={f} x={8 + i * 78} y="4" width="70" height="16" rx="8" fill={i === 0 ? c1 : '#ffffff'} opacity={i === 0 ? 0.5 : 0.08} />
+            ))}
+          </g>
+          {Array.from({ length: 12 }).map((_, i) => {
+            const flagged = i === 6;
+            const widths = [60, 210, 170, 40, 190, 150, 230, 60, 200, 170, 40, 120];
+            const colors = [c2, '#ffffff', c1, '#ffffff', c2, '#ffffff', '#ff6b6b', '#ffffff', c1, '#ffffff', c2, '#ffffff'];
+            const op = [0.7, 0.28, 0.55, 0.28, 0.5, 0.24, 0.75, 0.2, 0.5, 0.26, 0.6, 0.22];
+            return (
+              <g key={i} transform={`translate(24 ${160 + i * 34})`}>
+                <rect x="-10" width={flagged ? 372 : 0} height="26" fill={flagged ? '#ff6b6b' : 'transparent'} opacity="0.08" />
+                <rect x={(i * 13) % 20} width="16" height="4" rx="2" fill="#ffffff" opacity="0.15" />
+                <rect x="30" y="0" width={widths[i]} height="12" rx="3" fill={colors[i]} opacity={op[i]} />
+                {flagged && <>
+                  <circle cx={30 + widths[i] + 18} cy="6" r="7" fill="#ff6b6b" />
+                  <rect x={30 + widths[i] + 15} y="3" width="6" height="6" rx="1" fill="#0a0a12" />
+                </>}
+              </g>
+            );
+          })}
+          <g transform="translate(24 546)">
+            <rect width="352" height="60" rx="12" fill="#ff6b6b" opacity="0.1" />
+            <rect x="16" y="14" width="14" height="14" rx="7" fill="#ff6b6b" />
+            <rect x="42" y="16" width="220" height="10" rx="4" fill="#ffffff" opacity="0.4" />
+            <rect x="42" y="34" width="160" height="8" rx="4" fill="#ffffff" opacity="0.22" />
+          </g>
+        </>
+      )}
+
+      {/* ── PhysioElite: calendar + doctor profile + booking cards ─────────── */}
+      {kind === 'booking' && (
+        <>
+          <g transform="translate(24 116)">
+            <rect width="352" height="130" rx="16" fill="#ffffff" opacity="0.05" />
+            <rect x="16" y="14" width="120" height="12" rx="4" fill="#ffffff" opacity="0.45" />
+            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
+              <text key={i} x={20 + i * 46} y="52" fontSize="10" fill="#ffffff" opacity="0.35">{d}</text>
+            ))}
+            {Array.from({ length: 14 }).map((_, i) => {
+              const col = i % 7, row = Math.floor(i / 7);
+              const active = i === 9;
+              return <circle key={i} cx={24 + col * 46} cy={72 + row * 32} r="12" fill={active ? c2 : '#ffffff'} opacity={active ? 0.75 : 0.08} />;
+            })}
+          </g>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <g key={i} transform={`translate(24 ${266 + i * 130})`}>
+              <rect width="352" height="112" rx="16" fill="#ffffff" opacity="0.05" />
+              <circle cx="58" cy="56" r="30" fill={`url(#photo-${kind})`} />
+              <rect x="106" y="24" width="150" height="12" rx="4" fill="#ffffff" opacity="0.5" />
+              <rect x="106" y="46" width="100" height="9" rx="4" fill="#ffffff" opacity="0.28" />
+              <Star x={106} y={64} fill="#ffd54f" /><Star x={120} y={64} fill="#ffd54f" /><Star x={134} y={64} fill="#ffd54f" /><Star x={148} y={64} fill="#ffd54f" /><Star x={162} y={64} fill="#ffffff33" />
+              <rect x="270" y="40" width="66" height="28" rx="14" fill={c2} opacity="0.7" />
+              <rect x="282" y="49" width="42" height="10" rx="3" fill="#0a0a12" opacity="0.7" />
+            </g>
+          ))}
+        </>
+      )}
     </svg>
   );
 }
