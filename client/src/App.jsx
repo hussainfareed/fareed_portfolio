@@ -21,6 +21,10 @@ const PROJECTS = [
     category: 'fullstack',
     color: 'linear-gradient(135deg,rgba(255,90,95,.15),rgba(255,90,95,.04))',
     icon: '🏠',
+    // Add real screenshots here (e.g. imported from src/assets/projects/stayhub-1.png).
+    // Card auto-slides through these on hover. Leave empty to fall back to the icon tile.
+    images: [],
+    video: '', // optional: path/URL to a short muted screen-recording (mp4/webm) — takes priority over images
     highlights: [
       'JWT-based authentication with protected routes',
       'Property listing with search, filters & pagination',
@@ -41,6 +45,8 @@ const PROJECTS = [
     category: 'fullstack',
     color: 'linear-gradient(135deg,rgba(77,255,180,.1),rgba(99,102,241,.1))',
     icon: '🤖',
+    images: [],
+    video: '',
     highlights: [
       'Resume parsing and AI-based analysis',
       'Personalized interview question generation',
@@ -61,6 +67,8 @@ const PROJECTS = [
     category: 'fullstack',
     color: 'linear-gradient(135deg,rgba(245,158,11,.12),rgba(244,63,94,.08))',
     icon: '🧠',
+    images: [],
+    video: '',
     highlights: [
       'AI-powered code analysis and smart suggestions',
       'Supports multiple programming languages',
@@ -81,6 +89,8 @@ const PROJECTS = [
     category: 'fullstack',
     color: 'linear-gradient(135deg,rgba(99,102,241,.12),rgba(77,255,180,.08))',
     icon: '🏥',
+    images: [],
+    video: '',
     highlights: [
       'Online appointment booking system',
       'Doctor and physiotherapist profiles',
@@ -592,6 +602,126 @@ function ProjectModal({ project, onClose }) {
   );
 }
 
+// ─── PROJECT CARD (pro-level: 3D tilt + depth layers + sliding image/video preview) ─
+function ProjectCard({ project, index, featured, onOpen }) {
+  const cardRef = useRef(null);
+  const slideTimer = useRef(null);
+  const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
+  const [glare, setGlare] = useState({ x: 50, y: 50, o: 0 });
+  const [hovered, setHovered] = useState(false);
+  const [slide, setSlide] = useState(0);
+
+  const hasVideo = !!project.video;
+  const hasImages = !hasVideo && project.images && project.images.length > 0;
+
+  const onMove = (e) => {
+    const card = cardRef.current;
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width;
+    const py = (e.clientY - rect.top) / rect.height;
+    setTilt({ rx: (0.5 - py) * 14, ry: (px - 0.5) * 14 });
+    setGlare({ x: px * 100, y: py * 100, o: 0.18 });
+  };
+
+  const onEnter = () => {
+    setHovered(true);
+    if (hasImages && project.images.length > 1) {
+      slideTimer.current = setInterval(() => {
+        setSlide((s) => (s + 1) % project.images.length);
+      }, 1100);
+    }
+  };
+
+  const onLeave = () => {
+    setHovered(false);
+    setTilt({ rx: 0, ry: 0 });
+    setGlare((g) => ({ ...g, o: 0 }));
+    if (slideTimer.current) { clearInterval(slideTimer.current); slideTimer.current = null; }
+    setSlide(0);
+  };
+
+  useEffect(() => () => { if (slideTimer.current) clearInterval(slideTimer.current); }, []);
+
+  return (
+    <div
+      ref={cardRef}
+      className={`proj-card pro hoverable ${featured ? 'featured' : ''}`}
+      style={{
+        opacity: 1,
+        transform: `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`,
+        transitionDelay: `${index * 0.12}s`,
+        cursor: 'pointer',
+      }}
+      onMouseMove={onMove}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+      onClick={() => onOpen(project)}
+    >
+      <div className="proj-visual pro" style={{ background: project.color }}>
+        {/* depth layer: ambient glow, sits furthest back */}
+        <div className="proj-depth-glow" style={{ transform: 'translateZ(0px)' }} />
+
+        {/* depth layer: media (video / sliding screenshots / icon fallback) */}
+        <div className="proj-media-layer" style={{ transform: 'translateZ(20px)' }}>
+          {hasVideo ? (
+            <video
+              className="proj-media"
+              src={project.video}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="none"
+            />
+          ) : hasImages ? (
+            <div className="proj-slider" style={{ transform: `translateX(-${slide * 100}%)` }}>
+              {project.images.map((src, i) => (
+                <img key={i} src={src} alt={`${project.title} preview ${i + 1}`} className="proj-media" draggable={false} />
+              ))}
+            </div>
+          ) : (
+            <div className="proj-icon-fallback">{project.icon}</div>
+          )}
+        </div>
+
+        {/* depth layer: gradient scrim so overlay text stays readable */}
+        <div className="proj-scrim" style={{ transform: 'translateZ(30px)' }} />
+
+        {/* depth layer: slide dots */}
+        {hasImages && project.images.length > 1 && (
+          <div className="proj-dots" style={{ transform: 'translateZ(50px)' }}>
+            {project.images.map((_, i) => (
+              <span key={i} className={`proj-dot ${i === slide ? 'on' : ''}`} />
+            ))}
+          </div>
+        )}
+
+        {featured && <span className="feat-badge" style={{ transform: 'translateZ(60px)' }}>⭐ Featured</span>}
+
+        {/* depth layer: hover overlay actions, sits nearest camera */}
+        <div className="proj-overlay pro" style={{ transform: 'translateZ(70px)', opacity: hovered ? 1 : 0 }}>
+          <button className="overlay-btn hoverable" onClick={(e) => { e.stopPropagation(); onOpen(project); }}>👁 View Details</button>
+          <a href={project.githubUrl} className="overlay-btn hoverable" target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}>⑂ GitHub</a>
+          {project.liveUrl !== '#' && (
+            <a href={project.liveUrl} className="overlay-btn hoverable" target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}>🚀 Live Demo</a>
+          )}
+        </div>
+
+        {/* glare sweep for glass feel */}
+        <div className="proj-glare" style={{ background: `radial-gradient(circle at ${glare.x}% ${glare.y}%, rgba(255,255,255,${glare.o}), transparent 55%)` }} />
+      </div>
+
+      <div className="proj-info" style={{ transform: 'translateZ(10px)' }}>
+        <h3 className="proj-title">{project.title}</h3>
+        <p className="proj-desc">{project.shortDesc}</p>
+        <div className="stack-tags">{project.tags.map((t) => <span key={t} className="stack-tag">{t}</span>)}</div>
+        <div style={{ marginTop: '0.75rem', fontSize: '0.8rem', color: 'var(--accent)', opacity: 0.8 }}>Click to read more →</div>
+      </div>
+    </div>
+  );
+}
+
 // ─── PROJECTS ──────────────────────────────────────────────────────────────────
 function Projects() {
   const [filter,setFilter]=useState('all');
@@ -605,26 +735,17 @@ function Projects() {
         <div className="filter-row">
           {[['all','All'],['fullstack','Full Stack'],['frontend','Frontend'],['backend','Backend']].map(([k,l])=>(<button key={k} className={`filter-btn hoverable ${filter===k?'on':''}`} onClick={()=>setFilter(k)}>{l}</button>))}
         </div>
-        <div className="proj-grid">
-          {filtered.map((p,i)=>(
-            <div key={p._id} className={`proj-card hoverable ${p.featured&&i===0?'featured':''}`}
-              style={{opacity:inView?1:0,transform:inView?'none':'translateY(40px) scale(.97)',transition:`all .75s cubic-bezier(.16,1,.3,1) ${i*.12}s`,cursor:'pointer'}}
-              onClick={()=>setSelectedProject(p)}>
-              <div className="proj-visual" style={{background:p.color,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'4rem',minHeight:'180px'}}>
-                {p.icon}
-                {p.featured&&i===0&&<span className="feat-badge">⭐ Featured</span>}
-                <div className="proj-overlay">
-                  <button className="overlay-btn hoverable" onClick={e=>{e.stopPropagation();setSelectedProject(p);}}>👁 View Details</button>
-                  <a href={p.githubUrl} className="overlay-btn hoverable" target="_blank" rel="noreferrer" onClick={e=>e.stopPropagation()}>⑂ GitHub</a>
-                  {p.liveUrl!=='#'&&<a href={p.liveUrl} className="overlay-btn hoverable" target="_blank" rel="noreferrer" onClick={e=>e.stopPropagation()}>🚀 Live Demo</a>}
-                </div>
-              </div>
-              <div className="proj-info">
-                <h3 className="proj-title">{p.title}</h3>
-                <p className="proj-desc">{p.shortDesc}</p>
-                <div className="stack-tags">{p.tags.map(t=><span key={t} className="stack-tag">{t}</span>)}</div>
-                <div style={{marginTop:'0.75rem',fontSize:'0.8rem',color:'var(--accent)',opacity:0.8}}>Click to read more →</div>
-              </div>
+        <div className="proj-grid" style={{ perspective: '1400px' }}>
+          {filtered.map((p, i) => (
+            <div
+              key={p._id}
+              style={{
+                opacity: inView ? 1 : 0,
+                transform: inView ? 'none' : 'translateY(40px) scale(.97)',
+                transition: `opacity .75s cubic-bezier(.16,1,.3,1) ${i * .12}s, transform .75s cubic-bezier(.16,1,.3,1) ${i * .12}s`,
+              }}
+            >
+              <ProjectCard project={p} index={i} featured={p.featured && i === 0} onOpen={setSelectedProject} />
             </div>
           ))}
         </div>
@@ -763,7 +884,6 @@ function TiltInfoCard() {
               cursor: 'pointer',
             }}
           >
-            {/* glare overlay */}
             <div
               style={{
                 position: 'absolute',
@@ -889,6 +1009,79 @@ const modalStyles = `
   .proj-mockup-icon{font-size:5rem;text-align:center;display:flex;align-items:center;justify-content:center;width:100%;height:100%;min-height:180px}
   @keyframes fadeIn{from{opacity:0}to{opacity:1}}
   @keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+  /* ── PRO PROJECT CARDS: 3D depth + tilt + sliding preview ───────────────── */
+  .proj-card.pro{
+    position:relative;
+    border-radius:20px;
+    overflow:hidden;
+    transform-style:preserve-3d;
+    transition:transform .12s ease-out, box-shadow .3s ease;
+    will-change:transform;
+    background:var(--surface,#12121e);
+    border:1px solid var(--border,rgba(255,255,255,.08));
+  }
+  .proj-card.pro:hover{ box-shadow:0 30px 60px -20px rgba(0,0,0,.55), 0 0 0 1px rgba(77,255,180,.15); }
+  .proj-card.pro.featured{ border-color:rgba(77,255,180,.35); }
+
+  .proj-visual.pro{
+    position:relative;
+    min-height:220px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    transform-style:preserve-3d;
+  }
+
+  .proj-depth-glow{
+    position:absolute; inset:-20%;
+    background:radial-gradient(circle at 30% 20%, rgba(255,255,255,.12), transparent 60%);
+    pointer-events:none;
+  }
+
+  .proj-media-layer{ position:absolute; inset:0; overflow:hidden; }
+  .proj-icon-fallback{
+    width:100%; height:100%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:4rem;
+  }
+
+  .proj-slider{ display:flex; height:100%; transition:transform .55s cubic-bezier(.16,1,.3,1); }
+  .proj-slider .proj-media{ width:100%; height:100%; flex:0 0 100%; object-fit:cover; }
+  video.proj-media{ width:100%; height:100%; object-fit:cover; display:block; }
+
+  .proj-scrim{
+    position:absolute; inset:0;
+    background:linear-gradient(to top, rgba(0,0,0,.65) 0%, rgba(0,0,0,0) 45%);
+    pointer-events:none;
+  }
+
+  .proj-dots{
+    position:absolute; bottom:0.75rem; left:50%; transform:translateX(-50%) translateZ(50px);
+    display:flex; gap:6px; z-index:3;
+  }
+  .proj-dot{ width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,.35); transition:all .25s ease; }
+  .proj-dot.on{ background:var(--accent,#4DFFB4); width:16px; border-radius:3px; box-shadow:0 0 8px rgba(77,255,180,.6); }
+
+  .proj-overlay.pro{
+    position:absolute; inset:0; z-index:4;
+    display:flex; align-items:center; justify-content:center; gap:0.6rem; flex-wrap:wrap;
+    background:rgba(5,5,10,.35);
+    backdrop-filter:blur(3px);
+    transition:opacity .3s ease;
+    padding:1rem;
+  }
+
+  .proj-glare{
+    position:absolute; inset:0; pointer-events:none; z-index:5;
+    transition:opacity .2s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .proj-card.pro{ transform:none !important; }
+    .proj-slider{ transition:none; }
+  }
 `;
 
 // ─── APP ───────────────────────────────────────────────────────────────────────
