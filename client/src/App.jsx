@@ -24,7 +24,10 @@ const PROJECTS = [
     // Add real screenshots here (e.g. imported from src/assets/projects/stayhub-1.png).
     // Card auto-slides through these on hover. Leave empty to fall back to the icon tile.
     images: [],
-    video: '', // optional: path/URL to a short muted screen-recording (mp4/webm) — takes priority over images
+    video: '', // optional: path/URL to a short muted screen-recording (mp4/webm) — takes priority over generated mockup
+    mockupKind: 'listing',
+    accent1: '#FF5A5F',
+    accent2: '#FFB4B7',
     highlights: [
       'JWT-based authentication with protected routes',
       'Property listing with search, filters & pagination',
@@ -47,6 +50,9 @@ const PROJECTS = [
     icon: '🤖',
     images: [],
     video: '',
+    mockupKind: 'chat',
+    accent1: '#4DFFB4',
+    accent2: '#6366f1',
     highlights: [
       'Resume parsing and AI-based analysis',
       'Personalized interview question generation',
@@ -69,6 +75,9 @@ const PROJECTS = [
     icon: '🧠',
     images: [],
     video: '',
+    mockupKind: 'code',
+    accent1: '#f59e0b',
+    accent2: '#f43f5e',
     highlights: [
       'AI-powered code analysis and smart suggestions',
       'Supports multiple programming languages',
@@ -91,6 +100,9 @@ const PROJECTS = [
     icon: '🏥',
     images: [],
     video: '',
+    mockupKind: 'booking',
+    accent1: '#6366f1',
+    accent2: '#4DFFB4',
     highlights: [
       'Online appointment booking system',
       'Doctor and physiotherapist profiles',
@@ -602,6 +614,60 @@ function ProjectModal({ project, onClose }) {
   );
 }
 
+// ─── PROJECT MOCKUP (generated UI, acts as a live "screen recording" preview) ──
+function ProjectMockup({ kind, c1, c2 }) {
+  const rows = Array.from({ length: 6 });
+  return (
+    <svg className="proj-mockup-svg" viewBox="0 0 400 1000" preserveAspectRatio="xMidYMin slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id={`bg-${kind}`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor={c1} stopOpacity="0.18" />
+          <stop offset="100%" stopColor={c2} stopOpacity="0.10" />
+        </linearGradient>
+      </defs>
+      <rect width="400" height="1000" fill={`url(#bg-${kind})`} />
+
+      {kind === 'listing' && rows.map((_, i) => (
+        <g key={i} transform={`translate(24 ${40 + i * 150})`}>
+          <rect width="352" height="120" rx="14" fill="#ffffff" opacity="0.06" />
+          <rect width="130" height="120" rx="14" fill={c1} opacity="0.35" />
+          <rect x="150" y="16" width="180" height="14" rx="4" fill="#ffffff" opacity="0.5" />
+          <rect x="150" y="42" width="130" height="10" rx="4" fill="#ffffff" opacity="0.3" />
+          <rect x="150" y="66" width="90" height="10" rx="4" fill="#ffffff" opacity="0.25" />
+          <rect x="150" y="92" width="60" height="18" rx="9" fill={c2} opacity="0.55" />
+        </g>
+      ))}
+
+      {kind === 'chat' && rows.map((_, i) => (
+        <g key={i} transform={`translate(0 ${40 + i * 150})`}>
+          <rect x={i % 2 === 0 ? 24 : 130} width="246" height="80" rx="16" fill={i % 2 === 0 ? '#ffffff' : c1} opacity={i % 2 === 0 ? 0.07 : 0.4} />
+          <rect x={(i % 2 === 0 ? 24 : 130) + 18} y="16" width="180" height="10" rx="4" fill="#ffffff" opacity="0.45" />
+          <rect x={(i % 2 === 0 ? 24 : 130) + 18} y="36" width="140" height="10" rx="4" fill="#ffffff" opacity="0.3" />
+          <rect x={(i % 2 === 0 ? 24 : 130) + 18} y="56" width="100" height="10" rx="4" fill="#ffffff" opacity="0.25" />
+        </g>
+      ))}
+
+      {kind === 'code' && rows.map((_, i) => (
+        <g key={i} transform={`translate(24 ${40 + i * 60})`}>
+          <rect width={14} height="14" rx="3" fill={i % 3 === 0 ? c2 : '#ffffff'} opacity={i % 3 === 0 ? 0.7 : 0.15} />
+          <rect x="26" width={90 + (i * 37) % 200} height="14" rx="4" fill={i % 4 === 0 ? c1 : '#ffffff'} opacity={i % 4 === 0 ? 0.5 : 0.28} />
+        </g>
+      ))}
+
+      {kind === 'booking' && rows.map((_, i) => (
+        <g key={i} transform={`translate(24 ${40 + i * 150})`}>
+          <rect width="352" height="120" rx="16" fill="#ffffff" opacity="0.06" />
+          <circle cx="60" cy="60" r="30" fill={c1} opacity="0.4" />
+          <rect x="108" y="30" width="160" height="12" rx="4" fill="#ffffff" opacity="0.5" />
+          <rect x="108" y="52" width="110" height="10" rx="4" fill="#ffffff" opacity="0.28" />
+          <rect x="108" y="74" width="80" height="18" rx="9" fill={c2} opacity="0.5" />
+          <rect x="290" y="45" width="42" height="30" rx="8" fill={c2} opacity="0.35" />
+        </g>
+      ))}
+    </svg>
+  );
+}
+
 // ─── PROJECT CARD (pro-level: 3D tilt + depth layers + sliding image/video preview) ─
 function ProjectCard({ project, index, featured, onOpen }) {
   const cardRef = useRef(null);
@@ -658,11 +724,27 @@ function ProjectCard({ project, index, featured, onOpen }) {
       onMouseLeave={onLeave}
       onClick={() => onOpen(project)}
     >
+      {/* parallax glow blob — sits behind the card, drifts opposite to tilt for extra depth */}
+      <div
+        className="proj-parallax-blob"
+        style={{
+          background: `radial-gradient(circle, ${project.accent1}55, transparent 70%)`,
+          transform: `translate(${-tilt.ry * 2.2}px, ${tilt.rx * 2.2}px)`,
+        }}
+      />
+
       <div className="proj-visual pro" style={{ background: project.color }}>
         {/* depth layer: ambient glow, sits furthest back */}
         <div className="proj-depth-glow" style={{ transform: 'translateZ(0px)' }} />
 
-        {/* depth layer: media (video / sliding screenshots / icon fallback) */}
+        {/* depth layer: browser chrome — makes the preview read as a live app, not a static image */}
+        <div className="proj-chrome" style={{ transform: 'translateZ(45px)' }}>
+          <span className="proj-chrome-dot r" /><span className="proj-chrome-dot y" /><span className="proj-chrome-dot g" />
+          <span className="proj-chrome-url">{(project.liveUrl !== '#' ? project.liveUrl : project.githubUrl).replace(/^https?:\/\//, '')}</span>
+          {hovered && <span className="proj-rec"><span className="proj-rec-dot" />LIVE</span>}
+        </div>
+
+        {/* depth layer: media (video / sliding screenshots / auto-scrolling generated preview) */}
         <div className="proj-media-layer" style={{ transform: 'translateZ(20px)' }}>
           {hasVideo ? (
             <video
@@ -681,7 +763,9 @@ function ProjectCard({ project, index, featured, onOpen }) {
               ))}
             </div>
           ) : (
-            <div className="proj-icon-fallback">{project.icon}</div>
+            <div className={`proj-mockup-frame ${hovered ? 'scrolling' : ''}`}>
+              <ProjectMockup kind={project.mockupKind || 'listing'} c1={project.accent1 || '#4DFFB4'} c2={project.accent2 || '#6366f1'} />
+            </div>
           )}
         </div>
 
@@ -1081,6 +1165,61 @@ const modalStyles = `
   @media (prefers-reduced-motion: reduce){
     .proj-card.pro{ transform:none !important; }
     .proj-slider{ transition:none; }
+    .proj-mockup-frame.scrolling .proj-mockup-svg{ animation:none !important; }
+  }
+
+  /* ── parallax glow blob behind each card ─────────────────────────────────── */
+  .proj-card.pro{ position:relative; isolation:isolate; }
+  .proj-parallax-blob{
+    position:absolute; inset:-30% -20%; z-index:-1;
+    filter:blur(40px); opacity:.55; pointer-events:none;
+    transition:transform .2s ease-out;
+  }
+
+  /* ── browser chrome header on the media preview ──────────────────────────── */
+  .proj-chrome{
+    position:absolute; top:0; left:0; right:0; z-index:6;
+    display:flex; align-items:center; gap:6px;
+    padding:8px 12px;
+    background:rgba(8,8,14,.55);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .proj-chrome-dot{ width:7px; height:7px; border-radius:50%; display:inline-block; }
+  .proj-chrome-dot.r{ background:#ff5f56; }
+  .proj-chrome-dot.y{ background:#ffbd2e; }
+  .proj-chrome-dot.g{ background:#27c93f; }
+  .proj-chrome-url{
+    margin-left:6px; font-family:var(--font-mono,monospace); font-size:.65rem;
+    color:rgba(255,255,255,.5); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .proj-rec{
+    display:flex; align-items:center; gap:4px;
+    font-family:var(--font-mono,monospace); font-size:.6rem; font-weight:700;
+    color:#ff5f56; letter-spacing:.05em;
+  }
+  .proj-rec-dot{
+    width:6px; height:6px; border-radius:50%; background:#ff5f56;
+    animation:rec-pulse 1.1s ease-in-out infinite;
+  }
+  @keyframes rec-pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.25; } }
+
+  /* ── auto-scrolling generated mockup ("live preview" without real footage) ─ */
+  .proj-mockup-frame{
+    position:absolute; inset:0; top:30px; overflow:hidden;
+  }
+  .proj-mockup-svg{
+    width:100%; height:320%; display:block;
+    transform:translateY(0);
+  }
+  .proj-mockup-frame.scrolling .proj-mockup-svg{
+    animation:proj-scroll 7s ease-in-out infinite;
+  }
+  @keyframes proj-scroll{
+    0%{ transform:translateY(0); }
+    45%{ transform:translateY(-68%); }
+    55%{ transform:translateY(-68%); }
+    100%{ transform:translateY(0); }
   }
 `;
 
