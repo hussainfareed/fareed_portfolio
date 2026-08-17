@@ -398,39 +398,7 @@ function HeroOrbit() {
     </div>
   );
 }
-  );
-}
 
-function HoloConsole() {
-  const panelRef = useRef(null);
-  useEffect(() => {
-    const panel = panelRef.current;
-    if (!panel || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
-    const move = (event) => {
-      const rect = panel.getBoundingClientRect();
-      panel.style.setProperty('--panel-x', ((((event.clientX - rect.left) / rect.width) - .5) * 2).toFixed(3));
-      panel.style.setProperty('--panel-y', ((((event.clientY - rect.top) / rect.height) - .5) * 2).toFixed(3));
-    };
-    panel.addEventListener('pointermove', move);
-    return () => panel.removeEventListener('pointermove', move);
-  }, []);
-
-  return (
-    <div ref={panelRef} className="holo-console" aria-hidden="true">
-      <div className="console-glow" />
-      <div className="console-window">
-        <div className="console-bar"><span /><span /><span /><b>fareed@build-system</b></div>
-        <div className="console-lines">
-          <p><i>$</i> npm run <strong>create</strong></p>
-          <p><i>✓</i> UI system online</p>
-          <p><i>✓</i> API connected</p>
-          <p><i>✓</i> Deployment ready</p>
-        </div>
-        <div className="console-progress"><span /></div>
-      </div>
-      <div className="holo-coordinate coordinate-one">X: 24.93</div>
-      <div className="holo-coordinate coordinate-two">SYS / ONLINE</div>
-    </div>
   );
 }
 
@@ -480,7 +448,21 @@ function Hero() {
         <div className={`hero-visual ${inView?'in':''}`}>
         <div className={`hero-visual ${inView?'in':''}`}>
           <HeroOrbit />
-          <HoloConsole />
+          <div className="holo-console" aria-hidden="true">
+            <div className="console-glow" />
+            <div className="console-window">
+              <div className="console-bar"><span /><span /><span /><b>fareed@build-system</b></div>
+              <div className="console-lines">
+                <p><i>$</i> npm run <strong>create</strong></p>
+                <p><i>✓</i> UI system online</p>
+                <p><i>✓</i> API connected</p>
+                <p><i>✓</i> Deployment ready</p>
+              </div>
+              <div className="console-progress"><span /></div>
+            </div>
+            <div className="holo-coordinate coordinate-one">X: 24.93</div>
+            <div className="holo-coordinate coordinate-two">SYS / ONLINE</div>
+          </div>
           <div className="hero-card-3d hoverable">
           <div className="hero-card-3d hoverable">
             <div className="hero-card-inner">
