@@ -398,9 +398,7 @@ function HeroOrbit() {
   );
 }
 
-function FloatBadge({ children, style, color, delay = 0 }) {
-  return (<div className="float-badge hoverable" style={{ ...style, color, borderColor:color+'44', background:color+'11', animationDelay:delay+'s' }}>{children}</div>);
-}
+
 
 // ─── NAVBAR ────────────────────────────────────────────────────────────────────
 function Navbar({ theme, toggleTheme }) {
