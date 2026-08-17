@@ -424,7 +424,6 @@ function Navbar({ theme, toggleTheme }) {
 
 // ─── HERO ──────────────────────────────────────────────────────────────────────
 function Hero() {
-function Hero() {
   const { ref, inView } = useInView({ threshold:0.1, triggerOnce:true });
   return (
     <section className="hero-section" id="home" ref={ref}>
@@ -442,7 +441,6 @@ function Hero() {
           </div>
         </div>
         <div className={`hero-visual ${inView?'in':''}`}>
-          <HeroOrbit/>
           <HeroOrbit />
           <div className="hero-card-3d hoverable">
             <div className="hero-card-inner">
