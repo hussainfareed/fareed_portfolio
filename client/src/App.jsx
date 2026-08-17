@@ -355,6 +355,49 @@ function FloatBadge({ children, style, color, delay = 0 }) {
   return (<div className="float-badge hoverable" style={{ ...style, color, borderColor:color+'44', background:color+'11', animationDelay:delay+'s' }}>{children}</div>);
 }
 
+// Premium 3D orbit for the hero. It uses CSS transforms instead of a heavy 3D library.
+function HeroOrbit() {
+  const orbitRef = useRef(null);
+
+  useEffect(() => {
+    const orbit = orbitRef.current;
+    if (!orbit || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+
+    const move = (event) => {
+      const rect = orbit.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
+      const y = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
+      orbit.style.setProperty('--orbit-x', x.toFixed(3));
+      orbit.style.setProperty('--orbit-y', y.toFixed(3));
+    };
+    const reset = () => {
+      orbit.style.setProperty('--orbit-x', '0');
+      orbit.style.setProperty('--orbit-y', '0');
+    };
+
+    orbit.addEventListener('pointermove', move);
+    orbit.addEventListener('pointerleave', reset);
+    return () => {
+      orbit.removeEventListener('pointermove', move);
+      orbit.removeEventListener('pointerleave', reset);
+    };
+  }, []);
+
+  return (
+    <div ref={orbitRef} className="hero-orbit" aria-hidden="true">
+      <div className="orbit-aura" />
+      <div className="orbit-ring orbit-ring-one" />
+      <div className="orbit-ring orbit-ring-two" />
+      <div className="orbit-core"><span /></div>
+      <div className="orbit-chip orbit-chip-code">&lt;/&gt; BUILD</div>
+      <div className="orbit-chip orbit-chip-api">API</div>
+      <div className="orbit-chip orbit-chip-db">DB</div>
+      <div className="orbit-satellite satellite-one" />
+      <div className="orbit-satellite satellite-two" />
+    </div>
+  );
+}
+
 // ─── NAVBAR ────────────────────────────────────────────────────────────────────
 function Navbar({ theme, toggleTheme }) {
   const [scrolled,setScrolled]=useState(false);const [active,setActive]=useState('home');const [menuOpen,setMenuOpen]=useState(false);
@@ -381,6 +424,7 @@ function Navbar({ theme, toggleTheme }) {
 
 // ─── HERO ──────────────────────────────────────────────────────────────────────
 function Hero() {
+function Hero() {
   const { ref, inView } = useInView({ threshold:0.1, triggerOnce:true });
   return (
     <section className="hero-section" id="home" ref={ref}>
@@ -398,6 +442,8 @@ function Hero() {
           </div>
         </div>
         <div className={`hero-visual ${inView?'in':''}`}>
+          <HeroOrbit/>
+          <HeroOrbit />
           <div className="hero-card-3d hoverable">
             <div className="hero-card-inner">
               <div className="hero-avatar"><FLogo size={64}/></div>
