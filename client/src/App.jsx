@@ -357,7 +357,6 @@ function FloatBadge({ children, style, color, delay = 0 }) {
 
 // Premium 3D orbit for the hero. It uses CSS transforms instead of a heavy 3D library.
 function HeroOrbit() {
-function HeroOrbit() {
   const orbitRef = useRef(null);
 
   useEffect(() => {
@@ -399,7 +398,8 @@ function HeroOrbit() {
   );
 }
 
-  );
+function FloatBadge({ children, style, color, delay = 0 }) {
+  return (<div className="float-badge hoverable" style={{ ...style, color, borderColor:color+'44', background:color+'11', animationDelay:delay+'s' }}>{children}</div>);
 }
 
 // ─── NAVBAR ────────────────────────────────────────────────────────────────────
@@ -432,7 +432,6 @@ function Hero() {
   return (
     <section className="hero-section" id="home" ref={ref}>
       <div className="hero-bg"><div className="hero-grid"/><div className="hero-glow g1"/><div className="hero-glow g2"/><div className="hero-glow g3"/><Canvas3D className="hero-canvas"/></div>
-      <div className="hero-bg"><div className="hero-aurora"/><div className="hero-noise"/><div className="hero-grid"/><div className="hero-glow g1"/><div className="hero-glow g2"/><div className="hero-glow g3"/><Canvas3D className="hero-canvas"/></div>
       <div className="container hero-container">
         <div className={`hero-content ${inView?'in':''}`}>
           <div className="hero-badge hoverable"><span className="pulse-ring"/><span className="pulse-dot"/>Available for Hire &nbsp;🇵🇰 Pakistan</div>
@@ -446,24 +445,10 @@ function Hero() {
           </div>
         </div>
         <div className={`hero-visual ${inView?'in':''}`}>
-        <div className={`hero-visual ${inView?'in':''}`}>
           <HeroOrbit />
-          <div className="holo-console" aria-hidden="true">
-            <div className="console-glow" />
-            <div className="console-window">
-              <div className="console-bar"><span /><span /><span /><b>fareed@build-system</b></div>
-              <div className="console-lines">
-                <p><i>$</i> npm run <strong>create</strong></p>
-                <p><i>✓</i> UI system online</p>
-                <p><i>✓</i> API connected</p>
-                <p><i>✓</i> Deployment ready</p>
-              </div>
-              <div className="console-progress"><span /></div>
-            </div>
-            <div className="holo-coordinate coordinate-one">X: 24.93</div>
-            <div className="holo-coordinate coordinate-two">SYS / ONLINE</div>
-          </div>
           <div className="hero-card-3d hoverable">
+        </div>
+        <div className={`hero-visual ${inView?'in':''}`}>
           <div className="hero-card-3d hoverable">
             <div className="hero-card-inner">
               <div className="hero-avatar"><FLogo size={64}/></div>
